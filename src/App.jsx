@@ -1,66 +1,70 @@
 import { useState } from "react";
+import "./App.css";
 
 export default function App() {
-  const [step, setStep] = useState(0);
-  const [result, setResult] = useState("");
+  const [animal, setAnimal] = useState("");
+  const [breathing, setBreathing] = useState(false);
+  const [bleeding, setBleeding] = useState(false);
+  const [unconscious, setUnconscious] = useState(false);
 
-  const questions = [
-    {
-      q: "Ist das Tier bewusstlos oder reagiert nicht?",
-      yes: "🔴 SOFORT NOTFALLKLINIK",
-      no: null,
-    },
-    {
-      q: "Hat das Tier Atemprobleme?",
-      yes: "🔴 SOFORT NOTFALLKLINIK",
-      no: null,
-    },
-    {
-      q: "Starke Blutung sichtbar?",
-      yes: "🔴 SOFORT NOTFALLKLINIK",
-      no: null,
-    },
-    {
-      q: "Erbricht oder hat Durchfall, aber ist wach?",
-      yes: "🟠 Heute Tierarzt kontaktieren",
-      no: "🟢 Beobachten und Termin planen",
-    },
-  ];
-
-  function answer(type) {
-    const current = questions[step];
-
-    if (current[type]) {
-      setResult(current[type]);
-    } else {
-      setStep(step + 1);
+  function calculateTriage() {
+    if (unconscious || breathing || bleeding) {
+      return { level: "ROT", text: "SOFORT NOTFALL – Tierarzt sofort!" };
     }
+    if (animal !== "") {
+      return { level: "GELB", text: "Dringend – heute vorstellen." };
+    }
+    return { level: "GRÜN", text: "Routinefall." };
   }
 
-  if (result) {
-    return (
-      <div style={{ padding: 40 }}>
-        <h1>Vet-Notfall-Triage</h1>
-        <h2>{result}</h2>
-        <button
-          onClick={() => {
-            setStep(0);
-            setResult("");
-          }}
-        >
-          Neustart
-        </button>
-      </div>
-    );
-  }
+  const result = calculateTriage();
 
   return (
-    <div style={{ padding: 40 }}>
-      <h1>Vet-Notfall-Triage</h1>
-      <h2>{questions[step].q}</h2>
+    <div className="container">
+      <h1>🐾 Vet-Triage Leitstelle</h1>
 
-      <button onClick={() => answer("yes")}>Ja</button>
-      <button onClick={() => answer("no")}>Nein</button>
+      <h2>1. Tierart</h2>
+      <select onChange={(e) => setAnimal(e.target.value)}>
+        <option value="">Bitte wählen</option>
+        <option>Hund</option>
+        <option>Katze</option>
+        <option>Pferd</option>
+        <option>Nagetier</option>
+        <option>Exot</option>
+      </select>
+
+      <h2>2. Notfallfragen</h2>
+
+      <label>
+        <input
+          type="checkbox"
+          onChange={(e) => setBreathing(e.target.checked)}
+        />
+        Atemprobleme?
+      </label>
+
+      <label>
+        <input
+          type="checkbox"
+          onChange={(e) => setBleeding(e.target.checked)}
+        />
+        Starke Blutung?
+      </label>
+
+      <label>
+        <input
+          type="checkbox"
+          onChange={(e) => setUnconscious(e.target.checked)}
+        />
+        Bewusstlos?
+      </label>
+
+      <h2>3. Triage Ergebnis</h2>
+
+      <div className={`result ${result.level}`}>
+        <h3>{result.level}</h3>
+        <p>{result.text}</p>
+      </div>
     </div>
   );
 }
